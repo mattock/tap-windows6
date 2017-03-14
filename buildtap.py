@@ -72,7 +72,11 @@ class BuildTAPWindows(object):
 
     # run a command
     def system(self, cmd):
+<<<<<<< HEAD
         print("RUN:", cmd)
+=======
+        print "RUN:", cmd
+>>>>>>> Add quotes for makensis args. Fix troubles with spaces
         subprocess.call(cmd, shell=True)
 
     # make a directory
