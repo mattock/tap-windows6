@@ -17,7 +17,6 @@ To build, the following prerequisites are required:
       "Command Prompt for Visual Studio" and to call buildtap.py with "--sdk=wdk".
 - Source code directory of **devcon** sample from WDK (optional)
     - https://github.com/Microsoft/Windows-driver-samples/ setup/devcon
-    - Until [PR #238](https://github.com/Microsoft/Windows-driver-samples/pull/238) is resolved, you will have to add your own ARM64 configurations
 - Windows code signing certificate
 - Git (not strictly required, but useful for running commands using bundled bash shell)
 - MakeNSIS (optional)
@@ -62,15 +61,6 @@ Edit **version.m4** and **paths.py** as necessary then build::
 On successful completion, all build products will be placed in the "dist" 
 directory as well as tap6.tar.gz. The NSIS installer package will be placed to
 the build root directory.
-
-Note that due to the strict driver signing requirements in Windows 10 you need
-an EV certificate to sign the driver files. These EV certificates may be
-stored inside a hardware device, which makes fully automated signing process
-difficult, dangerous or impossible. Eventually the signing process will become
-even more involved, with drivers having to be submitted to the Windows
-Hardware Developer Center Dashboard portal. Therefore, by default, this
-buildsystem no longer signs any files. You can revert to the old behavior
-by using the --sign parameter.
 
 Building tapinstall (optional)
 ------------------------------
@@ -137,19 +127,30 @@ any attempt to timestamp the driver will fail. For this reason configure your
 outbound proxy server before starting the build. Note that the command prompt 
 also needs to be restarted to make use of new proxy settings.
 
-Notes on Authenticode signatures
---------------------------------
+About driver signing
+--------------------
 
-Recent Windows versions such as Windows 10 are fairly picky about the
-Authenticode signatures of kernel-mode drivers. In addition making older Windows
-versions such as Vista play along with signatures that Windows 10 accepts can be
-rather challenging. A good starting point on this topic is the
+While tap-windows6 buildsystem supports driver signing, it is unlikely you can
+actually make much use of it. This is because driver signing requirements in
+recent Windows versions have become more and more strict. Nowadays you will need
+to use a combination of cross-signing with an EV dongle
+(Windows 7/8/8.1/Server 2012r2), attestation signing (Windows 10) and
+WHQL-signing based on succesful HLK test result submission
+(Windows Server 2016/2019).
+
+In addition making older Windows versions such as Vista play along with
+signatures that Windows 7/8/8.1/Server 2012r2 accepts can be rather challenging.
+A good starting point on this topic is the
 `building tap-windows6 <https://community.openvpn.net/openvpn/wiki/BuildingTapWindows6>`_
 page on the OpenVPN community wiki. As that page points out, having two
 completely separate Authenticode signatures may be the only reasonable option.
 Fortunately there is a tool, `Sign-Tap6 <https://github.com/mattock/sign-tap6/>`_,
 which can be used to append secondary signatures to the tap-windows6 driver or
 to handle the entire signing process if necessary.
+
+The Sign-tap6 tool can also be used for signing tap-windows6 driver files using
+and EV dongle, which is the way to do signatures for Windows 7/8/8.1 and Server
+2012r2.
 
 License
 -------
